@@ -25,6 +25,16 @@ const InputForm: React.FC<InputFormProps> = ({
   const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
 
+  const getWordCount = (text: string) => {
+    const count = text.length
+    console.log('Current character count:', count)
+    return count
+  }
+
+  const wordCount = getWordCount(script)
+  console.log('Is word count valid:', wordCount > 0 && wordCount <= 800)
+  const isWordCountValid = wordCount > 0 && wordCount <= 800
+
   const validateEmail = (email: string) => {
     const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
     return re.test(String(email).toLowerCase())
@@ -83,6 +93,12 @@ const InputForm: React.FC<InputFormProps> = ({
     }
   }
 
+  console.log('Button should be disabled:', isLoading || !isWordCountValid, {
+    isLoading,
+    isWordCountValid,
+    wordCount
+  });
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div>
@@ -102,14 +118,22 @@ const InputForm: React.FC<InputFormProps> = ({
         <label htmlFor="script" className="block text-sm font-medium text-gray-700">
           Video Script
         </label>
-        <textarea
-          id="script"
-          value={script}
-          onChange={(e) => setScript(e.target.value)}
-          rows={5}
-          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-          required
-        ></textarea>
+        <div className="relative">
+          <textarea
+            id="script"
+            value={script}
+            onChange={(e) => setScript(e.target.value)}
+            rows={5}
+            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 pb-8 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            required
+          ></textarea>
+          <div className="absolute bottom-2 right-2 px-1 z-50 bg-secondary">
+  <p className={`text-sm ${wordCount > 800 ? 'text-red-500' : 'text-foreground'}`}>
+    {wordCount} / 800 characters
+  </p>
+</div>
+
+        </div>
       </div>
       <div>
         <label htmlFor="language" className="block text-sm font-medium text-gray-700">
@@ -135,8 +159,12 @@ const InputForm: React.FC<InputFormProps> = ({
       <div>
         <button
           type="submit"
-          disabled={isLoading}
-          className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+          disabled={isLoading || !isWordCountValid}
+          className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white 
+            ${isLoading || !isWordCountValid 
+              ? 'bg-gray-400 cursor-not-allowed' 
+              : 'bg-indigo-600 hover:bg-indigo-700'} 
+            focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`}
         >
           {isLoading ? (
             <>
@@ -165,4 +193,3 @@ const InputForm: React.FC<InputFormProps> = ({
 }
 
 export default InputForm
-
